@@ -3,16 +3,19 @@
 import ConfigParser
 
 class Agent(object):
-    pass
+    def __init__(self, name, mandate):
+        self.name = name
+        self.mandate = mandate
 
 class Invoice(object):
-    pass
+    def __init__(self, date, number, net_value):
+        self.date = date
+        self.number = number
+        self.net_value = net_value
 
 class Parameters(object):
-    # def __init__(self, rate, max_import, min_import):
-    #     self.rate = rate
-    #     self.max_import = max_import
-    #     self.min_import = min_import
+    def __init__(self):
+        self.config_file_path = 'config.ini'
 
     def loader(self, config_file_path):
         self.config_file_path = config_file_path
@@ -21,9 +24,6 @@ class Parameters(object):
         self.rate = Config.get('Parameters', 'rate')
 
 class Algorithms(object):
-    pass
-
-path = '/home/zero/Projects/Enasarco/config.ini'
-par = Parameters()
-par.loader(path)
-print par.rate
+    def calc_enasarco(self, net_value, rate):
+        enasarco_quote = float(net_value)*float(rate)/100
+        self.result = round(enasarco_quote, 2)
