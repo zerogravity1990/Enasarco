@@ -63,5 +63,15 @@ class Database(object):
         self.conn.commit() # without this call data aren't write into the db
         print "data ok"
 
-db = Database()
-db.check_existing_db()
+class Utility(object):
+    def __init__(self):
+        self.yes_list = ["yes", "y", "yeah", "yep"]
+        self.no_list = ["no", "n", "none", "nope"]
+
+    def check_answer(self, user_input, check_list):
+        self.user_input = user_input.lower()
+        self.check_list = check_list
+        print self.user_input, self.check_list
+        for elements in self.check_list:
+            if elements in self.user_input.split():
+                return True
