@@ -1,6 +1,7 @@
-#!/usr/bin/env python
-
+#!/usr/bin/python
+import sqlite3
 import ConfigParser
+import os
 
 class Agent(object):
     def __init__(self, name, mandate):
@@ -27,3 +28,40 @@ class Algorithms(object):
     def calc_enasarco(self, net_value, rate):
         enasarco_quote = float(net_value)*float(rate)/100
         self.result = round(enasarco_quote, 2)
+
+
+class Database(object):
+    def __init__(self):
+        pass
+    def check_existing_db(self):
+        self.db_filename = 'main.db'
+        self.db_is_new = not os.path.exists(self.db_filename) # checking existence of filename db
+        self.conn = sqlite3.connect(self.db_filename) # connecting to a not existing db will create it
+        if self.db_is_new is True:
+            print "creating db"
+            self.create_tables()
+        else:
+            print "db already exists"
+            # TODO inserting some init data
+        self.conn.close()
+
+    def create_tables(self):
+        '''Create database table'''
+        #TODO generalize the use of the method
+        self.conn.execute('''CREATE TABLE AGENTS
+                        (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        NAME TEXT NOT NULL,
+                        MANDATE TEXT NOT NULL);''')
+        print "table created"
+
+    def insert_data(self, name, mandate):
+        '''method for inserting data into database'''
+        #TODO generalize the use of the method
+        self.conn.execute('''INSERT INTO AGENTS \
+                        (NAME, MANDATE) \
+                        VALUES (?, ?)''', (name, mandate));
+        self.conn.commit() # without this call data aren't write into the db
+        print "data ok"
+
+db = Database()
+db.check_existing_db()
