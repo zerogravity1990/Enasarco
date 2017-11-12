@@ -8,11 +8,18 @@ class Agent(object):
         self.name = name
         self.mandate = mandate
 
+
 class Invoice(object):
-    def __init__(self, date, number, net_value):
+    def __init__(self, date, number, net_value, enasarco_rate):
         self.date = date
         self.number = number
         self.net_value = net_value
+        self.enasarco_rate = enasarco_rate
+        self.iva = net_value * 0.22
+        self.total_of_invoice = self.net_value + self.iva
+        self.ritenuta_acconto = net_value * 0.23 * 0.5
+        self.enasarco = self.net_value * self.enasarco_rate
+
 
 class Parameters(object):
     def __init__(self):
@@ -24,6 +31,7 @@ class Parameters(object):
         Config.read(config_file_path)
         self.rate = Config.get('Parameters', 'rate')
 
+
 class Algorithms(object):
     def calc_enasarco(self, net_value, rate):
         enasarco_quote = float(net_value)*float(rate)/100
@@ -32,7 +40,8 @@ class Algorithms(object):
 
 class Database(object):
     def __init__(self):
-        pass
+        # pass
+        self.db_filename = 'main.db'
     def check_existing_db(self):
         self.db_filename = 'main.db'
         self.db_is_new = not os.path.exists(self.db_filename) # checking existence of filename db
@@ -57,11 +66,24 @@ class Database(object):
     def insert_data(self, name, mandate):
         '''method for inserting data into database'''
         #TODO generalize the use of the method
-        self.conn.execute('''INSERT INTO AGENTS \
-                        (NAME, MANDATE) \
-                        VALUES (?, ?)''', (name, mandate));
+        self.conn = sqlite3.connect(self.db_filename)
+        with self.conn:
+            self.conn.execute('''INSERT INTO AGENTS \
+                            (NAME, MANDATE) \
+                            VALUES (?, ?)''', (name, mandate));
         self.conn.commit() # without this call data aren't write into the db
         print "data ok"
+
+    def get_agent_data(self):
+        '''Method for getting agent parameters from db'''
+        self.conn = sqlite3.connect(self.db_filename)
+        with self.conn:
+            self.cur = self.conn.cursor()
+            self.cur.execute('''SELECT * FROM AGENTS''');
+            self.rows = self.cur.fetchall()
+            for self.row in self.rows:
+                print self.row
+
 
 class Utility(object):
     def __init__(self):

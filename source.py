@@ -21,8 +21,14 @@ def starting():
         if util.check_answer(current_answer, util.yes_list):
             agent = main.Agent(agent_name, mandate)
             print agent.name, agent.mandate, "all ok"
+            db = main.Database()
+            db.check_existing_db()
+            db.insert_data(agent.name, agent.mandate)
         else:
             print "type your name again"
             starting()
 
 starting()
+print "\n \n \n"
+db2 = main.Database()
+db2.get_agent_data()
